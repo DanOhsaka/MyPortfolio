@@ -1,0 +1,13 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "description": "Professional portfolio website for a computer science student",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve -l 3000",
+    "dev": "npx live-server --port=3000 --open=index.html"
+  },
+  "keywords": ["portfolio", "website", "frontend"],
+  "author": "Chukwuebuka Michael Umeh",
+  "license": "MIT"
+}
