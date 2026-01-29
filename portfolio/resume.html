@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Chukwuebuka Michael Umeh - Resume">
+    <title>Resume | Chukwuebuka Michael Umeh</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        .resume-container {
+            min-height: 100vh;
+            background: var(--bg-dark);
+            padding: 100px 24px 40px;
+        }
+        
+        .resume-header {
+            max-width: 1200px;
+            margin: 0 auto 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .resume-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .resume-title i {
+            color: var(--primary);
+        }
+        
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        
+        .back-button:hover {
+            background: var(--primary);
+            color: var(--text-primary);
+            border-color: var(--primary);
+            transform: translateX(-5px);
+        }
+        
+        .resume-viewer {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .resume-viewer-header {
+            padding: 20px 24px;
+            background: var(--bg-darker);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .resume-controls {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .resume-control-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .resume-control-btn:hover {
+            background: var(--primary);
+            color: var(--text-primary);
+            border-color: var(--primary);
+        }
+        
+        .resume-control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .resume-viewer-body {
+            position: relative;
+            width: 100%;
+            min-height: 800px;
+            background: #525252;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .resume-pdf {
+            width: 100%;
+            height: 100vh;
+            min-height: 800px;
+            border: none;
+        }
+        
+        .resume-fallback {
+            padding: 60px 24px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .resume-fallback i {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 24px;
+            opacity: 0.5;
+        }
+        
+        .resume-fallback h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        
+        .resume-fallback p {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+            padding: 12px 24px;
+            background: var(--gradient-primary);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .resume-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .resume-title {
+                font-size: 1.5rem;
+            }
+            
+            .resume-viewer-body {
+                min-height: 600px;
+            }
+            
+            .resume-pdf {
+                min-height: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">&lt;CU/&gt;</a>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="index.html#home" class="nav-link">Home</a></li>
+                <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="index.html#projects" class="nav-link">Projects</a></li>
+                <li><a href="index.html#skills" class="nav-link">Skills</a></li>
+                <li><a href="index.html#certifications" class="nav-link">Certifications</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="resume-container">
+        <div class="resume-header">
+            <h1 class="resume-title">
+                <i class="fas fa-file-pdf"></i>
+                My Resume
+            </h1>
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to Portfolio
+            </a>
+        </div>
+        
+        <div class="resume-viewer">
+            <div class="resume-viewer-header">
+                <span style="color: var(--text-secondary); font-weight: 500;">
+                    <i class="fas fa-file-pdf"></i> Resume PDF
+                </span>
+                <div class="resume-controls">
+                    <a href="resume.pdf" download class="resume-control-btn" title="Download Resume">
+                        <i class="fas fa-download"></i>
+                    </a>
+                    <a href="resume.pdf" target="_blank" class="resume-control-btn" title="Open in New Tab">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="resume-viewer-body">
+                <iframe 
+                    src="resume.pdf#toolbar=1&navpanes=1&scrollbar=1" 
+                    class="resume-pdf"
+                    title="Resume PDF Viewer"
+                    id="resumeFrame">
+                </iframe>
+                <div class="resume-fallback" id="resumeFallback" style="display: none;">
+                    <i class="fas fa-file-pdf"></i>
+                    <h3>Resume Not Found</h3>
+                    <p>Please ensure your resume PDF file is named "resume.pdf"</p>
+                    <p>and placed in the portfolio directory.</p>
+                    <a href="index.html" class="download-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Return to Portfolio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if PDF loads successfully
+        const resumeFrame = document.getElementById('resumeFrame');
+        const resumeFallback = document.getElementById('resumeFallback');
+        
+        if (resumeFrame) {
+            resumeFrame.onerror = function() {
+                resumeFrame.style.display = 'none';
+                if (resumeFallback) {
+                    resumeFallback.style.display = 'block';
+                }
+            };
+            
+            // Fallback check after a delay
+            setTimeout(() => {
+                try {
+                    const frameDoc = resumeFrame.contentDocument || resumeFrame.contentWindow.document;
+                    if (!frameDoc || frameDoc.location.href === 'about:blank') {
+                        throw new Error('PDF not loaded');
+                    }
+                } catch (e) {
+                    resumeFrame.style.display = 'none';
+                    if (resumeFallback) {
+                        resumeFallback.style.display = 'block';
+                    }
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
