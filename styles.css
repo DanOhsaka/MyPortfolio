@@ -263,8 +263,8 @@ img {
 
 .hero-greeting {
     font-family: var(--font-mono);
-    font-size: 1.1rem;
-    color: var(--primary);
+    font-size: 1.6rem;
+    color: whitesmoke;
     margin-bottom: 16px;
     letter-spacing: 2px;
 }

@@ -31,11 +31,12 @@ const copyEmailBtn = document.getElementById('copy-email-btn');
 
 // ===== Typing Animation =====
 const titles = [
-    'Aspiring Software Developer',
+    'Aspiring Software Engineer',
     'Full Stack Engineer',
     'Problem Solver',
     'CS: Information Technology Student',
-    'Tech Enthusiast'
+    'Tech Enthusiast',
+    'AI and Machine Learning Engineer'
 ];
 
 let titleIndex = 0;
