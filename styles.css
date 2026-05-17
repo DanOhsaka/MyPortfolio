@@ -263,8 +263,8 @@ img {
 
 .hero-greeting {
     font-family: var(--font-mono);
-    font-size: 1.6rem;
-    color: whitesmoke;
+    font-size: 1.1rem;
+    color: var(--primary);
     margin-bottom: 16px;
     letter-spacing: 2px;
 }
@@ -603,6 +603,13 @@ section {
     position: relative;
     height: 200px;
     overflow: hidden;
+}
+
+.project-image img.project-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .project-placeholder {

@@ -31,12 +31,11 @@ const copyEmailBtn = document.getElementById('copy-email-btn');
 
 // ===== Typing Animation =====
 const titles = [
-    'Aspiring Software Engineer',
+    'Aspiring Software Developer',
     'Full Stack Engineer',
     'Problem Solver',
     'CS: Information Technology Student',
-    'Tech Enthusiast',
-    'AI and Machine Learning Engineer'
+    'Tech Enthusiast'
 ];
 
 let titleIndex = 0;
@@ -238,6 +237,22 @@ function setupProjectCards() {
     });
 }
 
+// ===== Contact Form =====
+function setupContactForm() {
+    const form = document.getElementById('contact-form');
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = form.querySelector('[name="name"]').value;
+        const email = form.querySelector('[name="email"]').value;
+        const message = form.querySelector('[name="message"]').value;
+        const subject = encodeURIComponent(`Portfolio contact from ${name}`);
+        const body = encodeURIComponent(`${message}\n\n---\nFrom: ${name}\nEmail: ${email}`);
+        window.location.href = `mailto:umehchukwuebuka29@gmail.com?subject=${subject}&body=${body}`;
+    });
+}
+
 // ===== Copy Email =====
 function setupCopyEmail() {
     if (!copyEmailBtn) return;
@@ -289,7 +304,7 @@ function setupCopyEmail() {
 function initializeAnimations() {
     // Add fade-in class to animated elements
     const animatedElements = document.querySelectorAll(
-        '.project-card, .skills-category, .about-content, .contact-content, .cert-card'
+        '.project-card, .skills-category, .about-content, .contact-cards, .cert-card'
     );
     animatedElements.forEach(el => el.classList.add('fade-in'));
     
@@ -315,6 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupMobileMenu();
     setupSmoothScroll();
     setupProjectCards();
+    setupContactForm();
     setupCopyEmail();
     initializeAnimations();
     
