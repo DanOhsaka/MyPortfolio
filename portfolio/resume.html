@@ -203,6 +203,7 @@
             <ul class="nav-menu" id="nav-menu">
                 <li><a href="index.html#home" class="nav-link">Home</a></li>
                 <li><a href="index.html#about" class="nav-link">About</a></li>
+                <li><a href="resume.html" class="nav-link">Resume</a></li>
                 <li><a href="index.html#projects" class="nav-link">Projects</a></li>
                 <li><a href="index.html#skills" class="nav-link">Skills</a></li>
                 <li><a href="index.html#certifications" class="nav-link">Certifications</a></li>
@@ -234,17 +235,17 @@
                     <i class="fas fa-file-pdf"></i> Resume PDF
                 </span>
                 <div class="resume-controls">
-                    <a href="Chukwuebuka_Resume_2026.pdf" download class="resume-control-btn" title="Download Resume">
+                    <a href="Umeh_Recent_Resume.pdf" download class="resume-control-btn" title="Download Resume">
                         <i class="fas fa-download"></i>
                     </a>
-                    <a href="Chukwuebuka_Resume_2026.pdf" target="_blank" class="resume-control-btn" title="Open in New Tab">
+                    <a href="Umeh_Recent_Resume.pdf" target="_blank" class="resume-control-btn" title="Open in New Tab">
                         <i class="fas fa-external-link-alt"></i>
                     </a>
                 </div>
             </div>
             <div class="resume-viewer-body">
                 <iframe 
-                    src="Chukwuebuka_Resume_2026.pdf#toolbar=1&navpanes=1&scrollbar=1" 
+                    src="Umeh_Recent_Resume.pdf#toolbar=1&navpanes=1&scrollbar=1" 
                     class="resume-pdf"
                     title="Resume PDF Viewer"
                     id="resumeFrame">
@@ -252,8 +253,7 @@
                 <div class="resume-fallback" id="resumeFallback" style="display: none;">
                     <i class="fas fa-file-pdf"></i>
                     <h3>Resume Not Found</h3>
-                    <p>Please ensure your resume PDF file is named "Chukwuebuka_Resume_2026.pdf"</p>
-                    <p>and placed in the portfolio directory.</p>
+                    <p>Please ensure <strong>Umeh_Recent_Resume.pdf</strong> is in the same folder as this page.</p>
                     <a href="index.html" class="download-btn">
                         <i class="fas fa-arrow-left"></i>
                         Return to Portfolio
@@ -265,33 +265,18 @@
 
     <script src="script.js"></script>
     <script>
-        // Check if PDF loads successfully
         const resumeFrame = document.getElementById('resumeFrame');
         const resumeFallback = document.getElementById('resumeFallback');
-        
-        if (resumeFrame) {
-            resumeFrame.onerror = function() {
-                resumeFrame.style.display = 'none';
-                if (resumeFallback) {
-                    resumeFallback.style.display = 'block';
-                }
-            };
-            
-            // Fallback check after a delay
-            setTimeout(() => {
-                try {
-                    const frameDoc = resumeFrame.contentDocument || resumeFrame.contentWindow.document;
-                    if (!frameDoc || frameDoc.location.href === 'about:blank') {
-                        throw new Error('PDF not loaded');
-                    }
-                } catch (e) {
-                    resumeFrame.style.display = 'none';
-                    if (resumeFallback) {
-                        resumeFallback.style.display = 'block';
-                    }
-                }
-            }, 2000);
-        }
+        const resumePdf = 'Umeh_Recent_Resume.pdf';
+
+        fetch(resumePdf, { method: 'HEAD' })
+            .then((response) => {
+                if (!response.ok) throw new Error('PDF not found');
+            })
+            .catch(() => {
+                if (resumeFrame) resumeFrame.style.display = 'none';
+                if (resumeFallback) resumeFallback.style.display = 'block';
+            });
     </script>
 </body>
 </html>
