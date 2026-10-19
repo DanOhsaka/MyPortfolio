@@ -577,6 +577,36 @@ section {
 /* ===== Projects Section ===== */
 .projects {
     background: var(--bg-dark);
+    overflow: hidden;
+}
+
+.carousel-hint {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: -8px 0 28px;
+    font-family: var(--font-mono);
+}
+
+.projects-carousel {
+    width: 100%;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: pan-y;
+    padding: 16px 0 28px;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.projects-carousel:active {
+    cursor: grabbing;
+}
+
+.projects-track {
+    display: flex;
+    gap: 32px;
+    width: max-content;
+    will-change: transform;
 }
 
 .projects-grid {
@@ -585,16 +615,20 @@ section {
     gap: 32px;
 }
 
+.projects-track .project-card {
+    flex: 0 0 min(360px, 82vw);
+    width: min(360px, 82vw);
+}
+
 .project-card {
     background: var(--bg-card);
     border-radius: 16px;
     overflow: hidden;
     border: 1px solid var(--border);
-    transition: var(--transition);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .project-card:hover {
-    transform: translateY(-10px);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     border-color: var(--primary);
 }

@@ -213,28 +213,169 @@ function setupSmoothScroll() {
 }
 
 // ===== Project Card Tilt Effect =====
-function setupProjectCards() {
-    projectCards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            if (window.innerWidth > 768) {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                const rotateX = (y - centerY) / 20;
-                const rotateY = (centerX - x) / 20;
-                
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
-            }
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
-        });
+function attachProjectTilt(card) {
+    card.addEventListener('mousemove', (e) => {
+        if (window.innerWidth > 768) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+        }
     });
+
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+    });
+}
+
+function setupProjectCards() {
+    projectCards.forEach(attachProjectTilt);
+}
+
+// ===== Projects horizontal carousel (keep card look, scroll RTL) =====
+function setupProjectsCarousel() {
+    const viewport = document.getElementById('projects-carousel');
+    const track = document.getElementById('projects-track');
+    if (!viewport || !track) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const SPEED = 0.22; // px per ms — slower continuous scroll
+    const DRAG_THRESHOLD = 8;
+
+    // Duplicate cards once for a seamless loop
+    const originals = Array.from(track.children);
+    if (originals.length === 0) return;
+
+    originals.forEach((card) => {
+        const clone = card.cloneNode(true);
+        clone.setAttribute('aria-hidden', 'true');
+        clone.querySelectorAll('a').forEach((a) => a.setAttribute('tabindex', '-1'));
+        track.appendChild(clone);
+        attachProjectTilt(clone);
+    });
+
+    let offset = 0;
+    let halfWidth = 0;
+    let paused = false;
+    let dragging = false;
+    let didDrag = false;
+    let lastX = 0;
+    let lastT = 0;
+    let velocity = 0;
+
+    function measure() {
+        // Width of one full set (before clones)
+        const gap = parseFloat(getComputedStyle(track).gap) || 32;
+        let total = 0;
+        originals.forEach((card, i) => {
+            total += card.offsetWidth;
+            if (i < originals.length - 1) total += gap;
+        });
+        // Include the gap between last original and first clone
+        halfWidth = total + gap;
+        wrapOffset();
+        track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+    }
+
+    function wrapOffset() {
+        if (halfWidth <= 0) return;
+        offset = ((offset % halfWidth) + halfWidth) % halfWidth;
+    }
+
+    function onPointerDown(e) {
+        if (e.button !== undefined && e.button !== 0) return;
+        dragging = true;
+        didDrag = false;
+        paused = true;
+        lastX = e.clientX;
+        lastT = performance.now();
+        velocity = 0;
+        try {
+            viewport.setPointerCapture(e.pointerId);
+        } catch (_) { /* ignore */ }
+    }
+
+    function onPointerMove(e) {
+        if (!dragging) return;
+        const now = performance.now();
+        const dx = e.clientX - lastX;
+        const dt = Math.max(1, now - lastT);
+        if (Math.abs(dx) > DRAG_THRESHOLD) didDrag = true;
+
+        // Dragging right moves content right (offset decreases)
+        offset -= dx;
+        velocity = dx / dt;
+        wrapOffset();
+        track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+
+        lastX = e.clientX;
+        lastT = now;
+    }
+
+    function onPointerUp(e) {
+        if (!dragging) return;
+        dragging = false;
+        try {
+            viewport.releasePointerCapture(e.pointerId);
+        } catch (_) { /* ignore */ }
+
+        // Keep a little flick momentum, then resume idle scroll
+        if (didDrag && Math.abs(velocity) > 0.05) {
+            const flick = -velocity * 180;
+            offset += flick;
+            wrapOffset();
+            track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+        }
+
+        if (!viewport.matches(':hover')) paused = false;
+    }
+
+    function onClickCapture(e) {
+        if (!didDrag) return;
+        // Prevent accidental link opens after a drag
+        if (e.target.closest('a')) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        didDrag = false;
+    }
+
+    viewport.addEventListener('pointerdown', onPointerDown);
+    viewport.addEventListener('pointermove', onPointerMove);
+    viewport.addEventListener('pointerup', onPointerUp);
+    viewport.addEventListener('pointercancel', onPointerUp);
+    viewport.addEventListener('pointerenter', () => { paused = true; });
+    viewport.addEventListener('pointerleave', () => {
+        if (!dragging) paused = false;
+    });
+    viewport.addEventListener('click', onClickCapture, true);
+
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(viewport);
+    measure();
+
+    let last = performance.now();
+    function tick(now) {
+        const dt = Math.min(32, now - last);
+        last = now;
+
+        if (!reduceMotion && !paused && !dragging) {
+            // Positive offset → content moves left (right → left)
+            offset += SPEED * dt;
+            wrapOffset();
+            track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+        }
+
+        requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
 }
 
 // ===== Contact Form =====
@@ -304,7 +445,7 @@ function setupCopyEmail() {
 function initializeAnimations() {
     // Add fade-in class to animated elements
     const animatedElements = document.querySelectorAll(
-        '.project-card, .skills-category, .about-content, .contact-cards, .cert-card'
+        '.projects-carousel, .skills-category, .about-content, .contact-cards, .cert-card'
     );
     animatedElements.forEach(el => el.classList.add('fade-in'));
     
@@ -330,6 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupMobileMenu();
     setupSmoothScroll();
     setupProjectCards();
+    setupProjectsCarousel();
     setupContactForm();
     setupCopyEmail();
     initializeAnimations();
