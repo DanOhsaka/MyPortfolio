@@ -261,6 +261,9 @@ function setupProjectsCarousel() {
     originals.forEach((card) => {
         const clone = card.cloneNode(true);
         clone.setAttribute('aria-hidden', 'true');
+        // cloneNode copies data-tilt-bound, which would skip attaching listeners
+        clone.removeAttribute('data-tilt-bound');
+        clone.style.transform = '';
         clone.querySelectorAll('a').forEach((a) => a.setAttribute('tabindex', '-1'));
         track.appendChild(clone);
         attachProjectTilt(clone);
