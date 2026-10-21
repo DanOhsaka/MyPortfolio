@@ -214,29 +214,34 @@ function setupSmoothScroll() {
 
 // ===== Project Card Tilt Effect =====
 function attachProjectTilt(card) {
+    if (!card || card.dataset.tiltBound === 'true') return;
+
     card.addEventListener('mousemove', (e) => {
-        if (window.innerWidth > 768) {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+        // Skip coarse touch pointers; keep tilt for mouse / trackpad
+        if (e.pointerType === 'touch') return;
 
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-            const rotateX = (y - centerY) / 20;
-            const rotateY = (centerX - x) / 20;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
 
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
-        }
+        const rotateX = (y - centerY) / 14;
+        const rotateY = (centerX - x) / 14;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-12px)`;
     });
 
     card.addEventListener('mouseleave', () => {
         card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
     });
+
+    card.dataset.tiltBound = 'true';
 }
 
 function setupProjectCards() {
-    projectCards.forEach(attachProjectTilt);
+    document.querySelectorAll('.project-card').forEach(attachProjectTilt);
 }
 
 // ===== Projects horizontal carousel (keep card look, scroll RTL) =====
@@ -264,11 +269,13 @@ function setupProjectsCarousel() {
     let offset = 0;
     let halfWidth = 0;
     let paused = false;
-    let dragging = false;
+    let pointerActive = false;
     let didDrag = false;
+    let startX = 0;
     let lastX = 0;
     let lastT = 0;
     let velocity = 0;
+    let activePointerId = null;
 
     function measure() {
         // Width of one full set (before clones)
@@ -291,23 +298,38 @@ function setupProjectsCarousel() {
 
     function onPointerDown(e) {
         if (e.button !== undefined && e.button !== 0) return;
-        dragging = true;
+        pointerActive = true;
         didDrag = false;
         paused = true;
+        activePointerId = e.pointerId;
+        startX = e.clientX;
         lastX = e.clientX;
         lastT = performance.now();
         velocity = 0;
-        try {
-            viewport.setPointerCapture(e.pointerId);
-        } catch (_) { /* ignore */ }
+        // Do NOT capture yet — capturing steals clicks from GitHub/demo links.
+        // Capture only after the pointer actually starts dragging.
     }
 
     function onPointerMove(e) {
-        if (!dragging) return;
+        if (!pointerActive || e.pointerId !== activePointerId) return;
+
+        const dxFromStart = e.clientX - startX;
+
+        // Wait until movement counts as a real drag before scrolling / capturing
+        if (!didDrag) {
+            if (Math.abs(dxFromStart) <= DRAG_THRESHOLD) return;
+            didDrag = true;
+            try {
+                viewport.setPointerCapture(e.pointerId);
+            } catch (_) { /* ignore */ }
+            lastX = e.clientX;
+            lastT = performance.now();
+            return;
+        }
+
         const now = performance.now();
         const dx = e.clientX - lastX;
         const dt = Math.max(1, now - lastT);
-        if (Math.abs(dx) > DRAG_THRESHOLD) didDrag = true;
 
         // Dragging right moves content right (offset decreases)
         offset -= dx;
@@ -320,26 +342,30 @@ function setupProjectsCarousel() {
     }
 
     function onPointerUp(e) {
-        if (!dragging) return;
-        dragging = false;
-        try {
-            viewport.releasePointerCapture(e.pointerId);
-        } catch (_) { /* ignore */ }
+        if (!pointerActive || e.pointerId !== activePointerId) return;
+        pointerActive = false;
+        activePointerId = null;
 
-        // Keep a little flick momentum, then resume idle scroll
-        if (didDrag && Math.abs(velocity) > 0.05) {
-            const flick = -velocity * 180;
-            offset += flick;
-            wrapOffset();
-            track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+        if (didDrag) {
+            try {
+                viewport.releasePointerCapture(e.pointerId);
+            } catch (_) { /* ignore */ }
+
+            // Keep a little flick momentum, then resume idle scroll
+            if (Math.abs(velocity) > 0.05) {
+                const flick = -velocity * 180;
+                offset += flick;
+                wrapOffset();
+                track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+            }
         }
 
         if (!viewport.matches(':hover')) paused = false;
     }
 
     function onClickCapture(e) {
+        // Only block link navigation when the gesture was a drag
         if (!didDrag) return;
-        // Prevent accidental link opens after a drag
         if (e.target.closest('a')) {
             e.preventDefault();
             e.stopPropagation();
@@ -353,7 +379,7 @@ function setupProjectsCarousel() {
     viewport.addEventListener('pointercancel', onPointerUp);
     viewport.addEventListener('pointerenter', () => { paused = true; });
     viewport.addEventListener('pointerleave', () => {
-        if (!dragging) paused = false;
+        if (!pointerActive) paused = false;
     });
     viewport.addEventListener('click', onClickCapture, true);
 
@@ -366,7 +392,7 @@ function setupProjectsCarousel() {
         const dt = Math.min(32, now - last);
         last = now;
 
-        if (!reduceMotion && !paused && !dragging) {
+        if (!reduceMotion && !paused && !pointerActive) {
             // Positive offset → content moves left (right → left)
             offset += SPEED * dt;
             wrapOffset();
